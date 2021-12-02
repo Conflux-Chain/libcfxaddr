@@ -1,6 +1,5 @@
 #pragma once
 
-#include <math.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -43,22 +42,25 @@ int cfxaddr_encode(uint8_t *in, char *out, size_t out_len, uint16_t network_id) 
     switch (network_id) {
         case CFXADDR_MAINNET_ID: {
             if (out_len < 4 + 34 + 8 + 1) { return CFXADDR_ERROR_WRONG_LENGTH; };
-            sprintf(prefix, "cfx:");
+            memcpy(prefix, "cfx:", 4);
             prefix_len = 4;
             break;
         }
 
         case CFXADDR_TESTNET_ID: {
             if (out_len < 8 + 34 + 8 + 1) { return CFXADDR_ERROR_WRONG_LENGTH; };
-            sprintf(prefix, "cfxtest:");
+            memcpy(prefix, "cfxtest:", 8);
             prefix_len = 8;
             break;
         }
 
         default: {
-            uint8_t length = ceil(log10(network_id + 1));
+            uint8_t length = 0;
+            uint16_t netid = network_id;
+            while (netid > 0) { length += 1; netid /= 10; }
+
             if (out_len < length + 4 + 34 + 8 + 1) { return CFXADDR_ERROR_WRONG_LENGTH; };
-            sprintf(prefix, "net%d:", network_id);
+            snprintf(prefix, 10, "net%d:", network_id);
             prefix_len = length + 4;
         }
     }
@@ -68,7 +70,7 @@ int cfxaddr_encode(uint8_t *in, char *out, size_t out_len, uint16_t network_id) 
         out[ii] = (uint8_t)prefix[ii] & CFXADDR_MASK5BIT;
     }
 
-    out[prefix_len] = 0x00;
+    out[prefix_len - 1] = 0x00;
 
     // convert 21 x 8bits (version byte + payload) to 34 x 5bits
     // treat as if version byte 0x00 is already in acc
