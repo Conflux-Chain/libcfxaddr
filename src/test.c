@@ -45,6 +45,7 @@ int main(void) {
     test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf", 10000, "net10000:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956jrm0uxb4");
     test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf", 65535, "net65535:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956dy1m7n6x");
     test_encode("0x10109fC8DF283027b6285cc889F5aA624EaC1F55", 65535, "net65535:aajbbh8j56ydak70fbspvctzzkve7na9myc0ba3yj5");
+    test_encode("0x10109fC8DF283027b6285cc889F5aA624EaC1F55",     0,     "net0:aajbbh8j56ydak70fbspvctzzkve7na9myjhst4bsb");
 
     // tests cases from CIP-37
     test_encode("0x85d80245dc02f5a89589e1f19c5c718e405b56cd", 1029,     "cfx:acc7uawf5ubtnmezvhu9dhc6sghea0403y2dgpyfjp");
