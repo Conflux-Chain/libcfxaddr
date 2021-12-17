@@ -22,11 +22,11 @@ void assert_equal(char *str1, char *str2) {
     }
 }
 
-void test_encode(char *hexaddr, uint16_t networkId, char *cfxaddr) {
+void test_encode(char *hexaddr, uint32_t networkId, char *cfxaddr) {
     uint8_t bytes[CFXADDR_HEX_ADDRESS_LEN] = { 0x00 };
     hex_to_bytes(hexaddr, bytes);
 
-    char addr[52] = { 0 };
+    char addr[CFXADDR_MAX_LENGTH + 1] = { 0 };
     int ret = cfxaddr_encode(bytes, addr, sizeof(addr), networkId);
     assert(ret == CFXADDR_SUCCESS);
     assert_equal(addr, cfxaddr);
@@ -80,6 +80,15 @@ int main(void) {
     test_encode("0x0888000000000000000000000000000000000003",  1029,      "cfx:aaejuaaaaaaaaaaaaaaaaaaaaaaaaaaaapx8thaezf");
     test_encode("0x0888000000000000000000000000000000000003",     1,  "cfxtest:aaejuaaaaaaaaaaaaaaaaaaaaaaaaaaaap3z61gsvt");
     test_encode("0x0888000000000000000000000000000000000003", 65535, "net65535:aaejuaaaaaaaaaaaaaaaaaaaaaaaaaaaap566ghmsw");
+
+    // large network id
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf",      65536,      "net65536:aaketjh9tkj5g2k4zx3kfvb9vkku8nr95690chjwh9");
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf",   16777215,   "net16777215:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956tz3vh911");
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf",   16777216,   "net16777216:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956x1p6wgp5");
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf",   33554431,   "net33554431:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956n977s70m");
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf",  268435455,  "net268435455:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956k8372c4e");
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf",  536870911,  "net536870911:aaketjh9tkj5g2k4zx3kfvb9vkku8nr956r2w200ez");
+    test_encode("0x1247a0ff7a51b3613aacf292c43f8a530f2dbfdf", 4294967295, "net4294967295:aaketjh9tkj5g2k4zx3kfvb9vkku8nr95660vurfn6");
 
     printf("Pass\n");
     return 0;

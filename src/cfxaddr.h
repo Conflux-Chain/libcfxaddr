@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string.h>
+#include <inttypes.h>  // PRIu32
+#include <stdint.h>    // uint8_t, uint16_t, uint32_t
+#include <stdio.h>     // snprintf
 
 #define CFXADDR_MAINNET_ID 1029
 #define CFXADDR_TESTNET_ID 1
@@ -28,6 +29,7 @@
 
 #define CFXADDR_SUCCESS 0
 #define CFXADDR_ERROR_WRONG_LENGTH 1
+#define CFXADDR_MAX_LENGTH 56
 
 // source: https://github.com/bitcoincashorg/bitcoincash.org/blob/master/spec/cashaddr.md
 uint64_t cfxaddr_polymod(uint8_t *data, size_t data_len) {
@@ -49,10 +51,10 @@ uint64_t cfxaddr_polymod(uint8_t *data, size_t data_len) {
     return c ^ 1;
 }
 
-int cfxaddr_encode(uint8_t *in, char *out, size_t out_len, uint16_t network_id) {
+int cfxaddr_encode(uint8_t *in, char *out, size_t out_len, uint32_t network_id) {
     static char CHARSET[] = "abcdefghjkmnprstuvwxyz0123456789";
 
-    char prefix[10]; // the longest prefix is "net" + "65535" + ':' + '\0'
+    char prefix[15]; // the longest prefix is "net" + "4294967295" + ':' + '\0'
     uint8_t prefix_len = 0;
 
     // initialize prefix based on network_id
@@ -73,11 +75,11 @@ int cfxaddr_encode(uint8_t *in, char *out, size_t out_len, uint16_t network_id) 
 
         default: {
             uint8_t length = 1;
-            uint16_t netid = network_id / 10;
+            uint32_t netid = network_id / 10;
             while (netid > 0) { length += 1; netid /= 10; }
 
             if (out_len < length + 4 + 34 + 8 + 1) { return CFXADDR_ERROR_WRONG_LENGTH; };
-            snprintf(prefix, 10, "net%d:", network_id);
+            snprintf(prefix, sizeof(prefix), "net%"PRIu32":", network_id);
             prefix_len = length + 4;
         }
     }
