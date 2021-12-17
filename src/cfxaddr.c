@@ -15,9 +15,7 @@
  *  limitations under the License.
  ********************************************************************************/
 
-#include <inttypes.h>  // PRIu32
 #include <stdint.h>    // uint8_t, uint16_t, uint32_t
-#include <stdio.h>     // snprintf
 #include <string.h>    // memcpy, memset
 
 #include "cfxaddr.h"
@@ -69,12 +67,25 @@ int cfxaddr_encode(uint8_t *in, char *out, size_t out_len, uint32_t network_id) 
 
         default: {
             uint8_t length = 1;
-            uint32_t netid = network_id / 10;
-            while (netid > 0) { length += 1; netid /= 10; }
+            uint32_t pow10 = 1;
+
+            while ((pow10 * 10 <= network_id) && (pow10 * 10 / 10 == pow10)) {
+                pow10 *= 10;
+                length += 1;
+            }
 
             if (out_len < length + 4 + 34 + 8 + 1) { return CFXADDR_ERROR_WRONG_LENGTH; };
-            snprintf(prefix, sizeof(prefix), "net%"PRIu32":", network_id);
-            prefix_len = length + 4;
+
+            prefix[prefix_len++] = 'n';
+            prefix[prefix_len++] = 'e';
+            prefix[prefix_len++] = 't';
+
+            while (pow10 > 0) {
+                prefix[prefix_len++] = '0' + ((network_id / pow10) % 10);
+                pow10 /= 10;
+            }
+
+            prefix[prefix_len++] = ':';
         }
     }
 
